@@ -187,29 +187,19 @@ Observando o gráfico de casos acumulados separado por sexo, podemos ver de form
 
 Uma última coisa interessante a ser feita, é análisar a taxa de letalidade da COVID-19. Para fazer isso precisamos calcular essa taxa e separar com as variáveis que queremos exibir no gráfico.  
 
-Primeiramente, criaremos uma nova variável, onde essa ira receber o valor "1" (string) se a variável "Evolucao" for igual a "Óbito pelo COVID-19" e se for diferente ira receber o valor "0" 
+Para fazer criamos um DataFrame chamado "casos" que vai agrupar as variáveis "RacaCor" e "Sexo" e fazer a contagem de casos confirmados. Depois, criamos um otro data frame com as mesmas variáveis, porém esse vai contar o número de mortes pela COVID-19. Por último, o DataFrame chamado "letalidade" foi responsável por calcular a taxa de letalidade da COVID-19. Vale ressaltar que a taxa de letalidade é a proporção entre o número de óbitos por uma doença em relação ao número de indivíduos acometidos por essa doença.
 
 ```{r message=F}
-attach(dados)
-prop <- rep(nrow(dados))
-for (i in 1:nrow(dados)){
-  if(Evolucao[i]=="Óbito pelo COVID-19"){prop[i] <- "1"
-  }else{prop[i] <- "0"}
-}
-dados$prop <- prop
-```
-
-Pronto, o próximo passo é criar um DataFrame que ira receber as variáveis que queremos analisar, nesse caso, "Sexo", "RacaCor" e "prop". Aqui já iremos calcular a taxa de letalidade.
-
-
-
-
-```{r message=F}
-taxa <- dados %>% 
-  group_by(Sexo,prop,RacaCor) %>% 
-  summarise(n=n()) %>% 
-  filter(prop =="1") %>% 
-  mutate(indice_mortalidade = (n/length(dados$prop))*100 )
+casos <- dados %>%
+  group_by(RacaCor,Sexo) %>%
+  summarise(n_casos = n())
+mortes <- dados %>% 
+  filter(Evolucao ==  "Óbito pelo COVID-19") %>%
+  group_by(RacaCor,Sexo) %>%
+  summarise(n_mortes = n())
+letalidade <- inner_join(casos, mortes) %>%
+  mutate(taxa_l =   ifelse(n_casos == 0, 0, 
+                               round(100 * n_mortes / n_casos, 1)))
 
 ```
 
@@ -217,7 +207,7 @@ taxa <- dados %>%
 Certo, por último iremos plotar o gráfico
 
 ```{r message=F}
-ggplot(taxa) + geom_col(aes(x= RacaCor, y=indice_mortalidade, fill= Sexo),position = "dodge") + 
+ggplot(letalidade) + geom_col(aes(x= RacaCor, y=taxa_l, fill= Sexo),position = "dodge") + 
   labs( x="Pessoas",
         y="Letalidade(%)",
         title="Taxa de letalidade da COVID-19 no ES") + 
@@ -225,7 +215,7 @@ ggplot(taxa) + geom_col(aes(x= RacaCor, y=indice_mortalidade, fill= Sexo),positi
 
 ```
 
-
+Ao observamos o gráfico, notamos que a taxa de letalidade do sexo masculino é maior em relação ao sexo feminino em todas as raças. Além disso, notamos também que a taxa de letalidade de pessoas indigenas é a maior de todas as 6 registradas. Notamos também uma diferença muito grande em relação ao sexo feminino e masculino em pessoas pretas e brancas, principalmente, enquanto em pessoas amarelas existe um certo "equilibrio".
 
 
 

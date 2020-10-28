@@ -9,7 +9,6 @@ library(forcats)
 
 dados <- read.csv("C:/Users/pedro/Desktop/MICRODADOS.csv", sep = ";")
 dados <- filter(dados, Classificacao=="Confirmados") 
-
 dados <- dados[sample(1:dim(dados)[1], 20000), ] # não mudei o nome para "dados_amostra" pois já tinha feito o código todo quando achei melhor resumir os dados
 
 
@@ -21,14 +20,7 @@ for(i in 1:nrow(dados)){
 }
 
 dados$Idade <- str_sub(dados$IdadeNaDataNotificacao, end = 2)
-# eu sei que poderia ter feito tudo dentro de um if só kkk
 
-dados <- mutate(dados,"Idade"=IdadeNaDataNotificacao)
-for(i in 1:nrow(dados)){
-  dados$Idade[i] <- str_sub(dados$Idade[i], end = 2)
-} ## essa função pega apenas os dois primeiros digitos da idade
-
-# questão 4 e 5 
   
 mortes <- dados %>% 
   filter(Evolucao=="Óbito pelo COVID-19") %>% 
@@ -42,7 +34,7 @@ mortes <- mortes %>%
   arrange(desc(óbitos)) %>% 
   ungroup()
 
-length(dados$Classificacao) # quantidade de casos confirmados 
+
 
 #### gráficos ####
 
@@ -56,7 +48,6 @@ ggplot(dados, aes(x = Idade, fill=Sexo)) +
   geom_histogram(color= "white",bins = 50) + theme_bw() +
   ylab("Frequência") + scale_fill_manual(values=c("black","red","purple"))
  
-
 
 attach(dados)
 regiao <- rep(nrow(dados))
@@ -101,41 +92,26 @@ regiao_s <-dados %>%
 
 
 
-
-#filtrar confirmados por sexo, obitos por covid, relação
-
-#mutate morte, se for obito =1 se for diferente = 0
-
-
-
-
-attach(dados)
-prop <- rep(nrow(dados))
-for (i in 1:nrow(dados)){
-  if(Evolucao[i]=="Óbito pelo COVID-19"){prop[i] <- "1"
-  }else{prop[i] <- "0"}
-  
-}
-dados$prop <- prop
-  
-
-taxa <- dados %>% 
-  group_by(Sexo,RacaCor,prop) %>% 
-  summarise(n=n()) %>% 
-  filter(prop =="1") %>% 
-  mutate(indice_mortalidade = (n/length(dados$prop))*100 )
+casos <- dados %>%
+  group_by(RacaCor,Sexo) %>%
+  summarise(n_casos = n())
+mortes <- dados %>% 
+  filter(Evolucao ==  "Óbito pelo COVID-19") %>%
+  group_by(RacaCor,Sexo) %>%
+  summarise(n_mortes = n())
+letalidade <- inner_join(casos, mortes) %>%
+  mutate(taxa_l =   ifelse(n_casos == 0, 0, 
+                               round(100 * n_mortes / n_casos, 1)))
 
 
-ggplot(taxa) + geom_col(aes(x= RacaCor, y=indice_mortalidade, fill= Sexo),position = "dodge") + 
+ggplot(letalidade) + geom_col(aes(x= RacaCor, y=taxa_l, fill= Sexo),position = "dodge") + 
   labs( x="Pessoas",
         y="Letalidade(%)",
         title="Taxa de letalidade da COVID-19 no ES") + 
   scale_fill_manual(values = c("yellow","purple")) + theme_bw()
                              
-  
+   
                          
-
-
 
 
 
