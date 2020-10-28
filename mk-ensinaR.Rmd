@@ -39,18 +39,19 @@ Agora podemos começar a organizar os dados para fazermos as análises.
 
 # Filtrando
 Como queremos fazer as análises baseada nos casos confirmados, podemos começar aplicando um filtro para selecionarmos apenas os casos confirmados. Depois disso, usaremos um `for` para mudarmos os nomes da variável "Sexo" e por último, criamos uma nova variável chama "Idade" que vai receber apenas os dois primeiros dígitos da varíavel "IdadeNaNotificacao".  
-A planilha original possui mais de 400mil observações e para não puxar muita memória do computador iremos usar o código `dados <- dados[sample(1:dim(dados)[1], 20000), ]` que ira restingrir a base de dados para que o computador consiga os códigos de maneira mais rápida
+
 
 ```{r}
 dados <- read.csv("C:/Users/pedro/Desktop/MICRODADOS.csv", sep = ";")
-dados <- filter(dados, Classificacao=="Confirmados") 
-dados <- dados[sample(1:dim(dados)[1], 20000), ]
+dados <- filter(dados, Classificacao=="Confirmados")
+
+
 for(i in 1:nrow(dados)){
   if(dados$Sexo[i]=="F"){dados$Sexo[i] <- "Feminino"}
   if(dados$Sexo[i]=="M"){dados$Sexo[i] <- "Masculino"}
   if(dados$Sexo[i]=="I"){dados$Sexo[i] <- "Ignorados"
   }
-}  
+}
 
 dados$Idade <- str_sub(dados$IdadeNaDataNotificacao, end = 2)
 ```
@@ -215,7 +216,7 @@ ggplot(letalidade) + geom_col(aes(x= RacaCor, y=taxa_l, fill= Sexo),position = "
 
 ```
 
-Ao observamos o gráfico, notamos que a taxa de letalidade do sexo masculino é maior em relação ao sexo feminino em todas as raças. Além disso, notamos também que a taxa de letalidade de pessoas indigenas é a maior de todas as 6 registradas. Notamos também uma diferença muito grande em relação ao sexo feminino e masculino em pessoas pretas e brancas, principalmente, enquanto em pessoas amarelas existe um certo "equilibrio".
+Ao observamos o gráfico, notamos que a taxa de letalidade do sexo masculino é maior em relação ao sexo feminino em todas as raças . Além disso, notamos também que a taxa de letalidade de pessoas indigenas é a maior de todas as 6 registradas. Notamos também uma diferença muito grande em relação ao sexo feminino e masculino em pessoas pretas e brancas, principalmente, enquanto em pessoas amarelas existe um certo "equilibrio".
 
 
 

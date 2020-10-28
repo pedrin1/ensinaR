@@ -9,7 +9,6 @@ library(forcats)
 
 dados <- read.csv("C:/Users/pedro/Desktop/MICRODADOS.csv", sep = ";")
 dados <- filter(dados, Classificacao=="Confirmados") 
-dados <- dados[sample(1:dim(dados)[1], 20000), ] # não mudei o nome para "dados_amostra" pois já tinha feito o código todo quando achei melhor resumir os dados
 
 
 for(i in 1:nrow(dados)){
@@ -112,8 +111,6 @@ ggplot(letalidade) + geom_col(aes(x= RacaCor, y=taxa_l, fill= Sexo),position = "
                              
    
                          
-
-
 
 
 
