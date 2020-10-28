@@ -76,7 +76,7 @@ ggplot(dados, aes(x = Idade, fill=Sexo)) +
 
 ```
 
-Uma outra coisa interessanta a ser feita é analisarmos os casos nas regiões do Espirito Santo. Seguimos a divisão feita pelo Governo do Estado que pode ser encontrada [clicando aqui](http://www.ijsn.es.gov.br/mapas/), onde o estado foi dividido nas seguintes regiões: Metropolitana, Central, norte e sul.  
+Uma outra coisa interessanta a ser feita é analisarmos os casos nas regiões do Espirito Santo. Seguimos a divisão feita pelo Governo do Estado que pode ser encontra da [clicando aqui](http://www.ijsn.es.gov.br/mapas/), onde o estado foi dividido nas seguintes regiões: Metropolitana, Central, norte e sul.  
 usamos um `for` para atribuirmos cada cidade a sua devida região.
 
 
@@ -181,14 +181,55 @@ ggplot(casos_t) +
   scale_color_viridis_d() + 
   labs(y = "Número de casos acumulados", 
        x = "Data Diagnóstico")
+```
+
+Observando o gráfico de casos acumulados separado por sexo, podemos ver de forma mais clara o que foi dito antes, o sexo femino tem uma frequência consideravelmente maior em relação ao masculino e foi maior em todo o intervalo de tempo analisado.  
+
+Uma última coisa interessante a ser feita, é análisar a taxa de letalidade da COVID-19. Para fazer isso precisamos calcular essa taxa e separar com as variáveis que queremos exibir no gráfico.  
+
+Primeiramente, criaremos uma nova variável, onde essa ira receber o valor "1" (string) se a variável "Evolucao" for igual a "Óbito pelo COVID-19" e se for diferente ira receber o valor "0" 
+
+```{r message=F}
+attach(dados)
+prop <- rep(nrow(dados))
+for (i in 1:nrow(dados)){
+  if(Evolucao[i]=="Óbito pelo COVID-19"){prop[i] <- "1"
+  }else{prop[i] <- "0"}
+}
+dados$prop <- prop
+```
+
+Pronto, o próximo passo é criar um DataFrame que ira receber as variáveis que queremos analisar, nesse caso, "Sexo", "RacaCor" e "prop". Aqui já iremos calcular a taxa de letalidade.
 
 
 
 
+```{r message=F}
+taxa <- dados %>% 
+  group_by(Sexo,prop,RacaCor) %>% 
+  summarise(n=n()) %>% 
+  filter(prop =="1") %>% 
+  mutate(indice_mortalidade = (n/length(dados$prop))*100 )
 
 ```
 
-Observando o gráfico de casos acumulados separado por sexo, podemos ver de forma mais clara o que foi dito antes, o sexo femino tem uma frequência consideravelmente maior em relação ao masculino e foi maior em todo o intervalo de tempo analisado.
+
+Certo, por último iremos plotar o gráfico
+
+```{r message=F}
+ggplot(taxa) + geom_col(aes(x= RacaCor, y=indice_mortalidade, fill= Sexo),position = "dodge") + 
+  labs( x="Pessoas",
+        y="Letalidade(%)",
+        title="Taxa de letalidade da COVID-19 no ES") + 
+  scale_fill_manual(values = c("yellow","purple")) + theme_bw()
+
+```
+
+
+
+
+
+
 
 
 

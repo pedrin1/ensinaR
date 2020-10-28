@@ -5,6 +5,7 @@ library(lubridate)
 library(tidyr)
 library(tidyverse)
 library(ggthemes)
+library(forcats)
 
 dados <- read.csv("C:/Users/pedro/Desktop/MICRODADOS.csv", sep = ";")
 dados <- filter(dados, Classificacao=="Confirmados") 
@@ -98,6 +99,41 @@ regiao_n <-dados %>%
 regiao_s <-dados %>%
   filter(dados$regiao=="Região Sul")
 
+
+
+
+#filtrar confirmados por sexo, obitos por covid, relação
+
+#mutate morte, se for obito =1 se for diferente = 0
+
+
+
+
+attach(dados)
+prop <- rep(nrow(dados))
+for (i in 1:nrow(dados)){
+  if(Evolucao[i]=="Óbito pelo COVID-19"){prop[i] <- "1"
+  }else{prop[i] <- "0"}
+  
+}
+dados$prop <- prop
+  
+
+taxa <- dados %>% 
+  group_by(Sexo,RacaCor,prop) %>% 
+  summarise(n=n()) %>% 
+  filter(prop =="1") %>% 
+  mutate(indice_mortalidade = (n/length(dados$prop))*100 )
+
+
+ggplot(taxa) + geom_col(aes(x= RacaCor, y=indice_mortalidade, fill= Sexo),position = "dodge") + 
+  labs( x="Pessoas",
+        y="Letalidade(%)",
+        title="Taxa de letalidade da COVID-19 no ES") + 
+  scale_fill_manual(values = c("yellow","purple")) + theme_bw()
+                             
+  
+                         
 
 
 
