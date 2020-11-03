@@ -46,16 +46,121 @@ ggplot(dados, aes(x = Idade, fill=Sexo)) +
   ylab("Frequência") + scale_fill_manual(values=c("black","red","purple"))
  
 
-attach(dados)
 regiao <- rep(nrow(dados))
-for (i in 1:nrow(dados)){
-  if(Municipio[i] =='VITORIA' |Municipio[i] =="SANTA LEOPOLDINA"| Municipio[i] =="MARECHAL FLORIANO"|  Municipio[i] =='FUNDAO' | Municipio[i] =='SERRA' | Municipio[i] =='VILA VELHA' | Municipio[i] =='CARIACICA' | Municipio[i] =='VIANA' | Municipio[i] =='GUARAPARI'| Municipio[i] ==" SANTA LEOPOLDINA"| Municipio[i] =="DOMIGOS MARTINS"| Municipio[i] =="MARCHAL FLORIANO"| Municipio[i] =="SANTA TERESA"| Municipio[i] =="SANTA MARIA DO JETIBA"| Municipio[i] =="ITAGUACU"| Municipio[i] =="LARANJA DA TERRA"| Municipio[i] =="ITARANA"| Municipio[i] =="AFONSO CLAUDIO"| Municipio[i] =="VENDA NOVA DO IMIGRANDE"| Municipio[i] =="BREJETUBA"| Municipio[i] =="CONCEICAO DO CASTELO"){regiao[i]<-'Região Metropolitana'}
-  if(Municipio[i] =='PRESIDENTE KENNEDY'	|Municipio[i] =="MUQUI"|  Municipio[i] =='MARATAIZES'	| Municipio[i] =='ITAPEMIRIM'	| Municipio[i] =='MIMOSO DO SUL' | Municipio[i] =='APIACA' | Municipio[i] =='BOM JESUS DO NORTE' | Municipio[i] =='SAO JOSE DO CALCADO' | Municipio[i] =="MUQI" | Municipio[i] =="ATILIO VIVACQUA" | Municipio[i] =="PIUMA "| Municipio[i] =="RIO NOVO DO SUL"| Municipio[i] =="CACHOEIRO DE ITAPEMIRIM"| Municipio[i] =="JERONIMO MONTEIRO" | Municipio[i] =="ALEGRE"| Municipio[i] =="GUACUI"| Municipio[i] =="DORES DO RIO PRETO"| Municipio[i] =="DIVINO DE SAO LOURENCO"| Municipio[i] =="IBITIRAMA" | Municipio[i] == "IUNA"| Municipio[i] =="IBATIBA"| Municipio[i] =="IRUPI"| Municipio[i] =="MUNIZ FREIRE"| Municipio[i] =="CASTELO"| Municipio[i] =="VARGEM ALTA"| Municipio[i] =="ALFREDO CHAVES"| Municipio[i] =="ANCHIETA"| Municipio[i] ==" ICONHA"| Municipio[i] =="RIO NOVO DO SUL"| Municipio[i] =="PIUMA"| Municipio[i] =="ICONHA"){regiao[i]<-'Região Sul'}
-  if(Municipio[i] =="ARACRUZ"| Municipio[i] =="IBIRACU"| Municipio[i] =="JOAO NEIVA"| Municipio[i] =="SAO ROQUE DO CANAA"| Municipio[i] =="BAIXO GUANDU"| Municipio[i] =="COLATINA"| Municipio[i] =="MARILANDIA"| Municipio[i] =="LINHARES"| Municipio[i] =="RIO BANANAL"| Municipio[i] =="PANCAS"| Municipio[i] =="SOORETAMA"| Municipio[i] =="GOVERNADOR LINDENBERG"| Municipio[i] =="SAO DOMINGOS DO NORTE" | Municipio[i] =="ALTO RIO NOVO"| Municipio[i] =="SAO GABRIEL DA PALHA"| Municipio[i] =="VILA VALERIO"){regiao[i]<- "Região Central"}
-  if(Municipio[i] =="AGUIA BRANCA"|Municipio[i] =="VENDA NOVA DO IMIGRANTE"|  Municipio[i] =="SANTA MARIA DE JETIBA"| Municipio[i] =="MANTENOPOLIS"| Municipio[i] =="JAGUARE"| Municipio[i] =="SAO MATEUS"| Municipio[i] =="NOVA VENECIA"| Municipio[i] =="BARRA DE SAO FRANCISCO"| Municipio[i] =="VILA PAVAO"| Municipio[i] =="BOA ESPERANCA"| Municipio[i] =="AGUA DOCE DO NORTE"| Municipio[i] =="CONCEICAO DA BARRA"| Municipio[i] =="PINHEIROS"| Municipio[i] =="PEDRO CANARIO"| Municipio[i] =="MONTANHA"| Municipio[i] =="MUCURICI"| Municipio[i] =="PONTO BELO"| Municipio[i] =="ECOPORANGA"){regiao[i]<-'Região Norte'}
+classifica_regiao <- function(Municipio){
+  reg_metropolitana <- c(
+    'VITORIA',
+    "DOMINGOS MARTINS" ,
+    "SANTA LEOPOLDINA" ,
+    "MARECHAL FLORIANO" ,
+    'FUNDAO' ,
+    'SERRA' ,
+    'VILA VELHA' ,
+    'CARIACICA' ,
+    'VIANA' ,
+    'GUARAPARI' ,
+    "SANTA LEOPOLDINA" ,
+    "DOMIGOS MARTINS" ,
+    "MARCHAL FLORIANO" ,
+    "SANTA TERESA" ,
+    "SANTA MARIA DO JETIBA" ,
+    "ITAGUACU" ,
+    "LARANJA DA TERRA" ,
+    "ITARANA" ,
+    "AFONSO CLAUDIO" ,
+    "VENDA NOVA DO IMIGRANDE" ,
+    "BREJETUBA" ,
+    "CONCEICAO DO CASTELO"
+  )
+  reg_norte <- c(
+    "AGUIA BRANCA " ,
+    "VENDA NOVA DO IMIGRANTE" ,
+    "SANTA MARIA DE JETIBA" ,
+    "MANTENOPOLIS" ,
+    "JAGUARE" ,
+    "SAO MATEUS" ,
+    "NOVA VENECIA" ,
+    "BARRA DE SAO FRANCISCO" ,
+    "VILA PAVAO" ,
+    "BOA ESPERANCA" ,
+    "AGUA DOCE DO NORTE" ,
+    "CONCEICAO DA BARRA" ,
+    "PINHEIROS" ,
+    "PEDRO CANARIO" ,
+    "MONTANHA" ,
+    "MUCURICI" ,
+    "PONTO BELO" ,
+    "ECOPORANGA"
+  )
+  
+  reg_central <- c(
+    "ARACRUZ" ,
+    "IBIRACU" ,
+    "JOAO NEIVA" ,
+    "SAO ROQUE DO CANAA" ,
+    "BAIXO GUANDU" ,
+    "COLATINA" ,
+    "MARILANDIA" ,
+    "LINHARES" ,
+    "RIO BANANAL" ,
+    "PANCAS" ,
+    "SOORETAMA" ,
+    "GOVERNADOR LINDENBERG" ,
+    "SAO DOMINGOS DO NORTE" ,
+    "ALTO RIO NOVO" ,
+    "SAO GABRIEL DA PALHA" ,
+    "VILA VALERIO"
+  )
+  
+  reg_sul <- c(
+    'PRESIDENTE KENNEDY'	,
+    "MUQUI" ,
+    'MARATAIZES'	,
+    'ITAPEMIRIM'	,
+    'MIMOSO DO SUL' ,
+    'APIACA' ,
+    'BOM JESUS DO NORTE' ,
+    'SAO JOSE DO CALCADO' ,
+    "MUQI" ,
+    "ATILIO VIVACQUA" ,
+    "PIUMA " ,
+    "RIO NOVO DO SUL" ,
+    "CACHOEIRO DE ITAPEMIRIM" ,
+    "JERONIMO MONTEIRO" ,
+    "ALEGRE" ,
+    "GUACUI" ,
+    "DORES DO RIO PRETO" ,
+    "DIVINO DE SAO LOURENCO" ,
+    "IBITIRAMA" ,
+    "IUNA" ,
+    "IBATIBA" ,
+    "IRUPI" ,
+    "MUNIZ FREIRE" ,
+    "CASTELO" ,
+    "VARGEM ALTA" ,
+    "ALFREDO CHAVES" ,
+    "ANCHIETA" ,
+    "ICONHA" ,
+    "RIO NOVO DO SUL" ,
+    "PIUMA" ,
+    "ICONHA"
+  )
+  
+  regiao <- 
+    ifelse(any(Municipio == reg_metropolitana),
+           "Região Metropolitana", 
+           ifelse(any(Municipio == reg_norte), 
+                  "Região Norte", 
+                  ifelse(any(Municipio == reg_central), 
+                         "Regiao Central", 
+                         ifelse(any(Municipio == reg_sul), 
+                                "Regiao Sul", "Outro Estado")
+                  )
+           )
+    )
+  return(regiao)
 }
 dados$regiao <- regiao
-
 
 dados <- dados %>% 
   mutate(DataNotificacao = as.Date(DataDiagnostico))

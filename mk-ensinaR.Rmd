@@ -42,7 +42,19 @@ Agora podemos começar a organizar os dados para fazermos as análises.
 Como queremos fazer as análises baseada nos casos confirmados, podemos começar aplicando um filtro para selecionarmos apenas os casos confirmados. Depois disso, usaremos o pacote `forcats` para mudarmos os nomes da variável "Sexo" e por último, criamos uma nova variável chama "Idade" que vai receber apenas os dois primeiros dígitos da varíavel "IdadeNaNotificacao".  
 
 
-```{r}
+```{r, eval=FALSE}
+dados <- read.csv("Colocar caminho onde está salvo/MICRODADOS.csv", sep = ";")
+dados <- filter(dados, Classificacao == "Confirmados")
+
+dados$Sexo <- fct_recode(dados$Sexo, 
+                    Masculino ="M",
+                    Feminino = "F",
+                    Ignorados = "I")
+
+dados$Idade <- str_sub(dados$IdadeNaDataNotificacao, end = 2)
+```
+
+```{r, echo=FALSE}
 dados <- read.csv("C:/Users/pedro/Desktop/MICRODADOS.csv", sep = ";")
 dados <- filter(dados, Classificacao=="Confirmados")
 
@@ -51,65 +63,187 @@ dados$Sexo <- fct_recode(dados$Sexo,
                     Feminino = "F",
                     Ignorados = "I")
 
-
 dados$Idade <- str_sub(dados$IdadeNaDataNotificacao, end = 2)
 ```
 
 # Gerando os primeiros gráficos
-com essas filtragens, já podemos começar a gerar alguns gráficos interessantes como, por exemplo, a quantidade de casos confirmados separados por faixa etária a quantidade de casos confirmados separados por Raça/Cor e um histograma de frequência separado por sexo. Vale ressaltar, que para gerar o histograma é necessário mudarmos a varíavel "Idade" para numeric, basta útilizar a função `as.numeric`.  
+
+Com essas filtragens, já podemos começar a gerar alguns gráficos interessantes como, por exemplo, a quantidade de casos confirmados separados por faixa etária a quantidade de casos confirmados separados por Raça/Cor e um histograma de frequência separado por sexo. Vale ressaltar, que para gerar o histograma é necessário mudarmos a varíavel "Idade" para numeric, basta útilizar a função `as.numeric`.  
 
 ```{r fig.width = 9, fig.height = 7 }
-ggplot(dados) + geom_bar(aes(x=FaixaEtaria), fill= "purple")+ 
-  labs(y= "Frequência") + scale_y_continuous(breaks = seq(0,100000,2500)) + theme_calc()
+ggplot(dados) +
+  geom_bar(aes(x = FaixaEtaria), fill = "purple") +
+  labs(y = "Frequência", title = "Gráfico de frequência ") +
+  scale_y_continuous(breaks = seq(0, 100000, 2500)) +
+  theme_calc()
 
-ggplot(dados) + geom_bar(aes(x=RacaCor, fill= RacaCor)) + scale_y_continuous(breaks = seq(0,100000,2500)) +
-  labs(y="Frequência") + theme_bw()
+ggplot(dados) +
+  geom_bar(aes(x = RacaCor, fill = RacaCor)) +
+  scale_y_continuous(breaks = seq(0, 100000, 2500)) +
+  labs(y = "Frequência", title = "Gráfico de frequência ") +
+  theme_bw() + 
+  scale_fill_viridis_d(name = "Raça/Cor")
 
 dados$Idade <- as.numeric(dados$Idade)
 
-
-ggplot(dados, aes(x = Idade, fill=Sexo)) +
-  geom_histogram(color= "white",bins = 50) + theme_bw() +
-  ylab("Frequência") + scale_fill_manual(values=c("yellow","red","purple"))
-
+ggplot(dados, aes(x = Idade, y = ..density..)) +
+  geom_histogram(color = "white", bins = 50, fill = 'purple') +
+  facet_wrap( ~ Sexo) +
+  theme_bw() +
+  ylab("Frequência") +
+  scale_fill_manual(values = c("yellow", "red", "purple"))
 
 
 ```
 
 Uma outra coisa interessanta a ser feita é analisarmos os casos nas regiões do Espirito Santo. Seguimos a divisão feita pelo Governo do Estado que pode ser encontra da [clicando aqui](http://www.ijsn.es.gov.br/mapas/), onde o estado foi dividido nas seguintes regiões: Metropolitana, Central, norte e sul.  
-usamos um `for` para atribuirmos cada cidade a sua devida região.
+usamos uma `function` para atribuirmos cada cidade a sua devida região.
 
 
-```{r message=FALSE, echo=FALSE}
-attach(dados)
+```{r message=FALSE}
 regiao <- rep(nrow(dados))
-
-for (i in 1:nrow(dados)){
-  if(Municipio[i] =='VITORIA' |Municipio[i] =="DOMINGOS MARTINS"| Municipio[i] =="SANTA LEOPOLDINA"| Municipio[i] =="MARECHAL FLORIANO"|  Municipio[i] =='FUNDAO' | Municipio[i] =='SERRA' | Municipio[i] =='VILA VELHA' | Municipio[i] =='CARIACICA' | Municipio[i] =='VIANA' | Municipio[i] =='GUARAPARI'| Municipio[i] ==" SANTA LEOPOLDINA"| Municipio[i] =="DOMIGOS MARTINS"| Municipio[i] =="MARCHAL FLORIANO"| Municipio[i] =="SANTA TERESA"| Municipio[i] =="SANTA MARIA DO JETIBA"| Municipio[i] =="ITAGUACU"| Municipio[i] =="LARANJA DA TERRA"| Municipio[i] =="ITARANA"| Municipio[i] =="AFONSO CLAUDIO"| Municipio[i] =="VENDA NOVA DO IMIGRANDE"| Municipio[i] =="BREJETUBA"| Municipio[i] =="CONCEICAO DO CASTELO"){regiao[i]<-'Região Metropolitana'}
-  if(Municipio[i] =="AGUIA BRANCA"|Municipio[i] =="VENDA NOVA DO IMIGRANTE"|  Municipio[i] =="SANTA MARIA DE JETIBA"| Municipio[i] =="MANTENOPOLIS"| Municipio[i] =="JAGUARE"| Municipio[i] =="SAO MATEUS"| Municipio[i] =="NOVA VENECIA"| Municipio[i] =="BARRA DE SAO FRANCISCO"| Municipio[i] =="VILA PAVAO"| Municipio[i] =="BOA ESPERANCA"| Municipio[i] =="AGUA DOCE DO NORTE"| Municipio[i] =="CONCEICAO DA BARRA"| Municipio[i] =="PINHEIROS"| Municipio[i] =="PEDRO CANARIO"| Municipio[i] =="MONTANHA"| Municipio[i] =="MUCURICI"| Municipio[i] =="PONTO BELO"| Municipio[i] =="ECOPORANGA"){regiao[i]<-'Região Norte'}
-  if(Municipio[i] =="ARACRUZ"| Municipio[i] =="IBIRACU"| Municipio[i] =="JOAO NEIVA"| Municipio[i] =="SAO ROQUE DO CANAA"| Municipio[i] =="BAIXO GUANDU"| Municipio[i] =="COLATINA"| Municipio[i] =="MARILANDIA"| Municipio[i] =="LINHARES"| Municipio[i] =="RIO BANANAL"| Municipio[i] =="PANCAS"| Municipio[i] =="SOORETAMA"| Municipio[i] =="GOVERNADOR LINDENBERG"| Municipio[i] =="SAO DOMINGOS DO NORTE" | Municipio[i] =="ALTO RIO NOVO"| Municipio[i] =="SAO GABRIEL DA PALHA"| Municipio[i] =="VILA VALERIO"){regiao[i]<- "Região Central"}
-  if(Municipio[i] == 'PRESIDENTE KENNEDY'	|Municipio[i] =="MUQUI"|  Municipio[i] =='MARATAIZES'	| Municipio[i] =='ITAPEMIRIM'	| Municipio[i] =='MIMOSO DO SUL' | Municipio[i] =='APIACA' | Municipio[i] =='BOM JESUS DO NORTE' | Municipio[i] =='SAO JOSE DO CALCADO' | Municipio[i] =="MUQI" | Municipio[i] =="ATILIO VIVACQUA" | Municipio[i] =="PIUMA "| Municipio[i] =="RIO NOVO DO SUL"| Municipio[i] =="CACHOEIRO DE ITAPEMIRIM"| Municipio[i] =="JERONIMO MONTEIRO" | Municipio[i] =="ALEGRE"| Municipio[i] =="GUACUI"| Municipio[i] =="DORES DO RIO PRETO"| Municipio[i] =="DIVINO DE SAO LOURENCO"| Municipio[i] =="IBITIRAMA" | Municipio[i] == "IUNA"| Municipio[i] =="IBATIBA"| Municipio[i] =="IRUPI"| Municipio[i] =="MUNIZ FREIRE"| Municipio[i] =="CASTELO"| Municipio[i] =="VARGEM ALTA"| Municipio[i] =="ALFREDO CHAVES"| Municipio[i] =="ANCHIETA"| Municipio[i] ==" ICONHA"| Municipio[i] =="RIO NOVO DO SUL"| Municipio[i] =="PIUMA"| Municipio[i] =="ICONHA"){regiao[i]<-'Região Sul'}
+classifica_regiao <- function(Municipio){
+  reg_metropolitana <- c(
+  'VITORIA',
+  "DOMINGOS MARTINS" ,
+  "SANTA LEOPOLDINA" ,
+  "MARECHAL FLORIANO" ,
+  'FUNDAO' ,
+  'SERRA' ,
+  'VILA VELHA' ,
+  'CARIACICA' ,
+  'VIANA' ,
+  'GUARAPARI' ,
+  "SANTA LEOPOLDINA" ,
+  "DOMIGOS MARTINS" ,
+  "MARCHAL FLORIANO" ,
+  "SANTA TERESA" ,
+  "SANTA MARIA DO JETIBA" ,
+  "ITAGUACU" ,
+  "LARANJA DA TERRA" ,
+  "ITARANA" ,
+  "AFONSO CLAUDIO" ,
+  "VENDA NOVA DO IMIGRANDE" ,
+  "BREJETUBA" ,
+  "CONCEICAO DO CASTELO"
+)
+  reg_norte <- c(
+    "AGUIA BRANCA " ,
+    "VENDA NOVA DO IMIGRANTE" ,
+    "SANTA MARIA DE JETIBA" ,
+    "MANTENOPOLIS" ,
+    "JAGUARE" ,
+    "SAO MATEUS" ,
+    "NOVA VENECIA" ,
+    "BARRA DE SAO FRANCISCO" ,
+    "VILA PAVAO" ,
+    "BOA ESPERANCA" ,
+    "AGUA DOCE DO NORTE" ,
+    "CONCEICAO DA BARRA" ,
+    "PINHEIROS" ,
+    "PEDRO CANARIO" ,
+    "MONTANHA" ,
+    "MUCURICI" ,
+    "PONTO BELO" ,
+    "ECOPORANGA"
+  )
+  
+  reg_central <- c(
+    "ARACRUZ" ,
+    "IBIRACU" ,
+    "JOAO NEIVA" ,
+    "SAO ROQUE DO CANAA" ,
+    "BAIXO GUANDU" ,
+    "COLATINA" ,
+    "MARILANDIA" ,
+    "LINHARES" ,
+    "RIO BANANAL" ,
+    "PANCAS" ,
+    "SOORETAMA" ,
+    "GOVERNADOR LINDENBERG" ,
+    "SAO DOMINGOS DO NORTE" ,
+    "ALTO RIO NOVO" ,
+    "SAO GABRIEL DA PALHA" ,
+    "VILA VALERIO"
+  )
+  
+  reg_sul <- c(
+    'PRESIDENTE KENNEDY'	,
+    "MUQUI" ,
+    'MARATAIZES'	,
+    'ITAPEMIRIM'	,
+    'MIMOSO DO SUL' ,
+    'APIACA' ,
+    'BOM JESUS DO NORTE' ,
+    'SAO JOSE DO CALCADO' ,
+    "MUQI" ,
+    "ATILIO VIVACQUA" ,
+    "PIUMA " ,
+    "RIO NOVO DO SUL" ,
+    "CACHOEIRO DE ITAPEMIRIM" ,
+    "JERONIMO MONTEIRO" ,
+    "ALEGRE" ,
+    "GUACUI" ,
+    "DORES DO RIO PRETO" ,
+    "DIVINO DE SAO LOURENCO" ,
+    "IBITIRAMA" ,
+    "IUNA" ,
+    "IBATIBA" ,
+    "IRUPI" ,
+    "MUNIZ FREIRE" ,
+    "CASTELO" ,
+    "VARGEM ALTA" ,
+    "ALFREDO CHAVES" ,
+    "ANCHIETA" ,
+    "ICONHA" ,
+    "RIO NOVO DO SUL" ,
+    "PIUMA" ,
+    "ICONHA"
+  )
+  
+  regiao <- 
+    ifelse(any(Municipio == reg_metropolitana),
+           "Região Metropolitana", 
+           ifelse(any(Municipio == reg_norte), 
+                  "Região Norte", 
+                  ifelse(any(Municipio == reg_central), 
+                         "Regiao Central", 
+                         ifelse(any(Municipio == reg_sul), 
+                                "Regiao Sul", "Outro Estado")
+                         )
+                  )
+           )
+  return(regiao)
 }
+source('funcao_classifica_regiao.R')
 dados$regiao <- regiao
 
 ```
 
-Devido ao tamanho do código, optamos por não exibilo. Havia presente na planilha alguns dados de fora do estado, do Rio de Janeiro por exemplo, como queremos análisar apenas o Espirito Santo, aplicamos um filtro para pegar apenas as cidade que foram atribuídas à uma das 4 regiões
+
 
 
 ```{r}
 dados2 <- dados %>%
-  filter(regiao=="Região Central" |regiao== "Região Metropolitana" |regiao=="Região Norte"| regiao=="Região Sul") 
+  filter(regiao != "Outro Estado") 
 
-dados2 <- rename(dados2, região="regiao")
+# 
+#   filter(regiao == "Região Central" |regiao== "Região Metropolitana" |regiao=="Região Norte"| regiao=="Região Sul") 
+
+# dados2 <- rename(dados2, região = "regiao")
 
 ```
 Pronto, agora conseguiremos ver de uma forma clara a quantidade de casos em casa região
 
 
 ```{r}
-ggplot(dados2) + geom_bar(aes(x=região,fill=região)) + scale_y_continuous(breaks = seq(0,100000, 10000)) +
-  labs(y="Frequência") + theme_bw() 
+ggplot(dados2) + 
+  geom_bar(aes(x = regiao, fill = regiao)) + 
+  scale_y_continuous(breaks = seq(0, 100000, 10000)) +
+  labs(y = "Frequência", 
+      x = "Regiões do Estado do Espírito Santo") + 
+  theme_bw() +
+  scale_fill_viridis_d()
 
 ```
 
@@ -122,10 +256,16 @@ Agora, iremos análisar em cada uma dessas regiões, os casos confirmados separa
 os códigos abaixos foram repetidos para cada uma das regiões, mudando apenas o parâmetro
 ```{r}
 regiao_m <-dados2 %>% 
-  filter(dados2$região=="Região Metropolitana", dados2$Sexo=="Masculino"|dados2$Sexo=="Feminino") 
+  filter(região == "Região Metropolitana",
+         Sexo == "Masculino" | dados2$Sexo=="Feminino") 
 
-ggplot(regiao_m) + geom_bar(aes(RacaCor, fill=Sexo), position = "dodge") + scale_y_continuous(breaks = seq(0,100000,2500)) +
-  labs(y="Frequência",x="Raça/Cor",title = "Região Metropolitana ") + theme_bw() + scale_fill_manual(values=c("yellow","purple"))
+ggplot(regiao_m) + 
+  geom_bar(aes(RacaCor, fill=Sexo), position = "dodge") + 
+  scale_y_continuous(breaks = seq(0,100000,2500)) +
+  labs(y="Frequência",x="Raça/Cor",title = "Região Metropolitana ") + 
+  theme_bw() + 
+  scale_fill_viridis_d()
+  
 ```
     
     
@@ -211,7 +351,8 @@ ggplot(letalidade) + geom_col(aes(x= RacaCor, y=taxa_l, fill= Sexo),position = "
   labs( x="Pessoas",
         y="Letalidade(%)",
         title="Taxa de letalidade da COVID-19 no ES") + 
-  scale_fill_manual(values = c("yellow","purple")) + theme_bw()
+  scale_fill_viridis_d() + 
+  theme_bw()
 
 ```
 
