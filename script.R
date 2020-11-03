@@ -11,16 +11,14 @@ dados <- read.csv("C:/Users/pedro/Desktop/MICRODADOS.csv", sep = ";")
 dados <- filter(dados, Classificacao=="Confirmados") 
 
 
-for(i in 1:nrow(dados)){
-  if(dados$Sexo[i]=="F"){dados$Sexo[i] <- "Feminino"}
-  if(dados$Sexo[i]=="M"){dados$Sexo[i] <- "Masculino"}
-  if(dados$Sexo[i]=="I"){dados$Sexo[i] <- "Ignorados"
-  }
-}
+
+dados$Sexo <- fct_recode(dados$Sexo, 
+                    Masculino ="M",
+                    Feminino = "F",
+                    Ignorados = "I")
 
 dados$Idade <- str_sub(dados$IdadeNaDataNotificacao, end = 2)
 
-  
 mortes <- dados %>% 
   filter(Evolucao=="Óbito pelo COVID-19") %>% 
   group_by(Municipio, RacaCor,Classificacao) %>% 
@@ -38,7 +36,7 @@ mortes <- mortes %>%
 #### gráficos ####
 
 ggplot(dados) + geom_bar(aes(x=FaixaEtaria), fill= "purple")+ 
-  labs(y= "Frequência") + scale_y_continuous(breaks = seq(0,100000,500)) + theme_calc()
+  labs(y= "Frequência") + scale_y_continuous(breaks = seq(0,100000,2500)) + theme_calc()
 
 dados$Idade <- as.numeric(dados$Idade)
 
