@@ -297,6 +297,7 @@ ggplot(regiao_s) + geom_bar(aes(RacaCor, fill=Sexo), position = "dodge") + scale
 
 Ao olharmos para os gráficos dessas regiões podemos tirar algumas conclusões. De forma geral, ao olharmos para a variável sexo, o feminino é maior em relação ao masculino em quase todas as situações com algumas exceções, como por exemplo, na raça classificada como "ignorado". Se olharmos agora para a variável raça/cor, é visível que a classificação branca e parda aparecem muito mais em relação as outras, a raça indígina, apesar de frequente em todas as 4 regiões, tem uma presença muito pequena aparecendo mais na região central.
 
+
 Agora queremos observar a distribuição dos casos, separados por sexo, ao longo do tempo.  
 
 
