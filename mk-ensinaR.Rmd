@@ -24,6 +24,7 @@ library(tidyr)
 library(tidyverse)
 library(ggthemes)
 library(forcats)
+library(viridis)
 
 ```
 
@@ -91,7 +92,7 @@ ggplot(dados, aes(x = Idade, y = ..density..)) +
   facet_wrap( ~ Sexo) +
   theme_bw() +
   ylab("Frequência") +
-  scale_fill_manual(values = c("yellow", "red", "purple"))
+  scale_fill_viridis_d()
 
 
 ```
@@ -99,18 +100,9 @@ ggplot(dados, aes(x = Idade, y = ..density..)) +
 Uma outra coisa interessanta a ser feita é analisarmos os casos nas regiões do Espirito Santo. Seguimos a divisão feita pelo Governo do Estado que pode ser encontra da [clicando aqui](http://www.ijsn.es.gov.br/mapas/), onde o estado foi dividido nas seguintes regiões: Metropolitana, Central, norte e sul.  
 usamos uma `function` para atribuirmos cada cidade a sua devida região.
 
-
-<<<<<<< HEAD
 ```{r message=FALSE}
+
 regiao <- rep(nrow(dados))
-=======
-```{r message=FALSE, echo=FALSE}
-# attach(dados)
-regiao <- rep(nrow(dados))
-
-
-
->>>>>>> 6fb67b8ee1bb111e45970230a200d51ad4c9e0ff
 classifica_regiao <- function(Municipio){
   reg_metropolitana <- c(
   'VITORIA',
@@ -135,8 +127,8 @@ classifica_regiao <- function(Municipio){
   "VENDA NOVA DO IMIGRANDE" ,
   "BREJETUBA" ,
   "CONCEICAO DO CASTELO"
-)
-<<<<<<< HEAD
+ )
+
   reg_norte <- c(
     "AGUIA BRANCA " ,
     "VENDA NOVA DO IMIGRANTE" ,
@@ -210,9 +202,7 @@ classifica_regiao <- function(Municipio){
     "PIUMA" ,
     "ICONHA"
   )
-=======
->>>>>>> 6fb67b8ee1bb111e45970230a200d51ad4c9e0ff
-  
+
   regiao <- 
     ifelse(any(Municipio == reg_metropolitana),
            "Região Metropolitana", 
@@ -226,93 +216,13 @@ classifica_regiao <- function(Municipio){
                   )
            )
   return(regiao)
-<<<<<<< HEAD
-=======
+  
 }
 
 source('funcao_classifica_regiao.R')
 
-dados <- dados %>% 
-  mutate(regiao = classifica_regiao(Municipio))
-
-  if () {
-    regiao[i] <- 'Região Metropolitana'
-  }
-  if (Municipio[i] == "AGUIA BRANCA " |
-      Municipio[i] == "VENDA NOVA DO IMIGRANTE" |
-      Municipio[i] == "SANTA MARIA DE JETIBA" |
-      Municipio[i] == "MANTENOPOLIS" |
-      Municipio[i] == "JAGUARE" |
-      Municipio[i] == "SAO MATEUS" |
-      Municipio[i] == "NOVA VENECIA" |
-      Municipio[i] == "BARRA DE SAO FRANCISCO" |
-      Municipio[i] == "VILA PAVAO" |
-      Municipio[i] == "BOA ESPERANCA" |
-      Municipio[i] == "AGUA DOCE DO NORTE" |
-      Municipio[i] == "CONCEICAO DA BARRA" |
-      Municipio[i] == "PINHEIROS" |
-      Municipio[i] == "PEDRO CANARIO" |
-      Municipio[i] == "MONTANHA" |
-      Municipio[i] == "MUCURICI" |
-      Municipio[i] == "PONTO BELO" |
-      Municipio[i] == "ECOPORANGA") {
-    regiao[i] <- 'Região Norte'
-  }
-  if (Municipio[i] == "ARACRUZ" |
-      Municipio[i] == "IBIRACU" |
-      Municipio[i] == "JOAO NEIVA" |
-      Municipio[i] == "SAO ROQUE DO CANAA" |
-      Municipio[i] == "BAIXO GUANDU" |
-      Municipio[i] == "COLATINA" |
-      Municipio[i] == "MARILANDIA" |
-      Municipio[i] == "LINHARES" |
-      Municipio[i] == "RIO BANANAL" |
-      Municipio[i] == "PANCAS" |
-      Municipio[i] == "SOORETAMA" |
-      Municipio[i] == "GOVERNADOR LINDENBERG" |
-      Municipio[i] == "SAO DOMINGOS DO NORTE" |
-      Municipio[i] == "ALTO RIO NOVO" |
-      Municipio[i] == "SAO GABRIEL DA PALHA" |
-      Municipio[i] == "VILA VALERIO") {
-    regiao[i] <- "Região Central"
-  }
-  if (Municipio[i] == 'PRESIDENTE KENNEDY'	|
-      Municipio[i] == "MUQUI" |
-      Municipio[i] == 'MARATAIZES'	|
-      Municipio[i] == 'ITAPEMIRIM'	|
-      Municipio[i] == 'MIMOSO DO SUL' |
-      Municipio[i] == 'APIACA' |
-      Municipio[i] == 'BOM JESUS DO NORTE' |
-      Municipio[i] == 'SAO JOSE DO CALCADO' |
-      Municipio[i] == "MUQI" |
-      Municipio[i] == "ATILIO VIVACQUA" |
-      Municipio[i] == "PIUMA " |
-      Municipio[i] == "RIO NOVO DO SUL" |
-      Municipio[i] == "CACHOEIRO DE ITAPEMIRIM" |
-      Municipio[i] == "JERONIMO MONTEIRO" |
-      Municipio[i] == "ALEGRE" |
-      Municipio[i] == "GUACUI" |
-      Municipio[i] == "DORES DO RIO PRETO" |
-      Municipio[i] == "DIVINO DE SAO LOURENCO" |
-      Municipio[i] == "IBITIRAMA" |
-      Municipio[i] == "IUNA" |
-      Municipio[i] == "IBATIBA" |
-      Municipio[i] == "IRUPI" |
-      Municipio[i] == "MUNIZ FREIRE" |
-      Municipio[i] == "CASTELO" |
-      Municipio[i] == "VARGEM ALTA" |
-      Municipio[i] == "ALFREDO CHAVES" |
-      Municipio[i] == "ANCHIETA" |
-      Municipio[i] == "ICONHA" |
-      Municipio[i] == "RIO NOVO DO SUL" |
-      Municipio[i] == "PIUMA" |
-      Municipio[i] == "ICONHA") {
-    regiao[i] <- 'Região Sul'
-  }
->>>>>>> 6fb67b8ee1bb111e45970230a200d51ad4c9e0ff
-}
-source('funcao_classifica_regiao.R')
 dados$regiao <- regiao
+dasadd
 
 ```
 
@@ -322,17 +232,17 @@ dados$regiao <- regiao
 ```{r}
 dados2 <- dados %>%
   filter(regiao != "Outro Estado") 
-<<<<<<< HEAD
+
 
 # 
 #   filter(regiao == "Região Central" |regiao== "Região Metropolitana" |regiao=="Região Norte"| regiao=="Região Sul") 
 
-=======
+
 
 # 
 #   filter(regiao == "Região Central" |regiao== "Região Metropolitana" |regiao=="Região Norte"| regiao=="Região Sul") 
 
->>>>>>> 6fb67b8ee1bb111e45970230a200d51ad4c9e0ff
+
 # dados2 <- rename(dados2, região = "regiao")
 
 ```
@@ -360,19 +270,19 @@ os códigos abaixos foram repetidos para cada uma das regiões, mudando apenas o
 ```{r}
 regiao_m <-dados2 %>% 
   filter(região == "Região Metropolitana",
-         Sexo == "Masculino" | dados2$Sexo=="Feminino") 
+         Sexo == "Masculino" | Sexo=="Feminino") 
 
 ggplot(regiao_m) + 
   geom_bar(aes(RacaCor, fill=Sexo), position = "dodge") + 
   scale_y_continuous(breaks = seq(0,100000,2500)) +
   labs(y="Frequência",x="Raça/Cor",title = "Região Metropolitana ") + 
   theme_bw() + 
-<<<<<<< HEAD
+
   scale_fill_viridis_d()
   
-=======
+
   scale_fill_manual(values=c("yellow","purple"))
->>>>>>> 6fb67b8ee1bb111e45970230a200d51ad4c9e0ff
+
 ```
     
     
