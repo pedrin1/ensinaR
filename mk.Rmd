@@ -37,7 +37,7 @@ Outra maneira de obter a planilha é baixando ela diretamente pelo site e import
 Agora podemos começar a organizar os dados para fazermos as análises.  
 
 # Filtrando
-Como queremos fazer as análises baseada nos casos confirmados, podemos começar aplicando um filtro para selecionarmos apenas os casos confirmados. Depois disso, usaremos o pacote `forcats` para mudarmos os nomes da variável "Sexo" e por último, criamos uma nova variável chama "Idade" que vai receber apenas os dois primeiros dígitos da varíavel "IdadeNaNotificacao".  
+Como queremos fazer as análises baseada nos casos confirmados, podemos começar aplicando um filtro para selecionarmos apenas os casos confirmados. Depois disso, usaremos o pacote `forcats` para mudarmos os nomes da variável "Sexo" e por último, criamos uma nova variável chamada "Idade" que vai receber apenas os dois primeiros dígitos da varíavel "IdadeNaNotificacao".  
 
 
 ```{r, eval=FALSE}
@@ -65,6 +65,8 @@ dados$Idade <- str_sub(dados$IdadeNaDataNotificacao, end = 2)
 Com essas filtragens, já podemos começar a gerar alguns gráficos interessantes como, por exemplo, a quantidade de casos confirmados separados por faixa etária a quantidade de casos confirmados separados por Raça/Cor e um histograma de frequência separado por sexo. Vale ressaltar, que para gerar o histograma é necessário mudarmos a varíavel "Idade" para numeric, basta útilizar a função `as.numeric`.  
 
 ```{r fig.width = 9, fig.height = 7 }
+dados <- filter(dados, Sexo != "Ignorados")
+
 ggplot(dados) +
   geom_bar(aes(x = FaixaEtaria), fill = "purple") +
   labs(y = "Frequência",
@@ -80,6 +82,7 @@ ggplot(dados) +
        title = "Gráfico de frequência") +
   theme_bw() +
   scale_fill_viridis_d(name = "Raça/Cor")
+
 dados$Idade <- as.numeric(dados$Idade)
 ggplot(dados, aes(x = Idade, y = ..density..)) +
   geom_histogram(color = "white", bins = 50, fill = 'purple') +
@@ -88,6 +91,8 @@ ggplot(dados, aes(x = Idade, y = ..density..)) +
   ylab("Frequência") +
   scale_fill_viridis_d()
 ```
+
+Observação: aplicamos um filtro na variável sexo que removeu os dados classificados como "Ignorados", para melhorar a visualização e a comparação entre os sexos Masculinos e Femininos, já que existia uma quantidade pequena de ignorados.  
 
 Uma outra coisa interessanta a ser feita é analisarmos os casos nas regiões do Espirito Santo. Seguimos a divisão feita pelo Governo do Estado que pode ser encontra da [clicando aqui](http://www.ijsn.es.gov.br/mapas/), onde o estado foi dividido nas seguintes regiões: Metropolitana, Central, norte e sul.  
 usamos uma `function` para atribuirmos cada cidade a sua devida região.
@@ -210,7 +215,7 @@ dados$regiao <- sapply(dados$Municipio, classifica_regiao)
 ```
 
 
-Pronto, agora conseguiremos ver de uma forma clara a quantidade de casos em casa região
+Pronto, agora conseguiremos ver de uma forma clara a quantidade de casos em cada região
 
 ```{r fig.width = 9, fig.height = 7}
 ggplot(dados) + geom_bar(aes(x = regiao, fill = regiao)) +
@@ -223,15 +228,12 @@ ggplot(dados) + geom_bar(aes(x = regiao, fill = regiao)) +
 ```
 
 
-Pronto, agora conseguiremos ver de uma forma clara a quantidade de casos em casa região
-
-
-Podemos notar o quanto a região metropolitana se destaca em relação as outras, a grosso modo, possui mais casos confirmados do que as outras 3 regiões juntas. A região norte foi a que menos registrou casos.  
+Podemos notar o quanto a região metropolitana se destaca em relação as outras, a grosso modo, possui mais casos confirmados do que as outras 4 regiões juntas. A região norte, considerando o Espirito Santo, foi a que menos registrou casos.  
 
 Agora, iremos análisar em cada uma dessas regiões, os casos confirmados separados por sexo e raça/cor. Uma observação a ser feita é, como não possui nenhum caso com sexo classificado como "indeterminado" fizemos um filtro para tirar essa observação do gráfico, apenas para fim estético.
 
 
-os códigos abaixos foram repetidos para cada uma das regiões, mudando apenas o parâmetro
+os códigos abaixos foram repetidos para cada uma das regiões, mudando apenas o conjunto de dados que contém as informações de cada região.
 
 ```{r}
 regiao_m <- dados %>%
