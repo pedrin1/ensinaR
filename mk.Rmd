@@ -1,0 +1,335 @@
+---
+title: "ensinaR"
+author: "Pedro de Brito Neto"
+date: "19/10/2020"
+output: html_document
+---
+
+# Introdução
+ Bruno, descrever o projeto
+ 
+ 
+ 
+ 
+ 
+Primeiramente vamos carregar alguns pacotes que iremos útilizar
+ 
+```{r message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(janitor)
+library(lubridate)
+library(tidyr)
+library(tidyverse)
+library(ggthemes)
+library(forcats)
+```
+
+
+Após carregar os pacotes, iremos carregar o conjunto de dados. Uma forma de ler diretamente essa informação no R pode ser feita da seguinte
+forma.  
+
+*dados <- read.csv("https://bi.static.es.gov.br/covid19/MICRODADOS.csv",
+                  sep = ";",
+                  fileEncoding = "ISO-8859-1")  *
+
+Outra maneira de obter a planilha é baixando ela diretamente pelo site e importando do seu computador. Nesse caso,iremos trabalhar dessa forma.  
+Agora podemos começar a organizar os dados para fazermos as análises.  
+
+# Filtrando
+Como queremos fazer as análises baseada nos casos confirmados, podemos começar aplicando um filtro para selecionarmos apenas os casos confirmados. Depois disso, usaremos o pacote `forcats` para mudarmos os nomes da variável "Sexo" e por último, criamos uma nova variável chama "Idade" que vai receber apenas os dois primeiros dígitos da varíavel "IdadeNaNotificacao".  
+
+
+```{r, eval=FALSE}
+dados <- read.csv("Colocar caminho onde está salvo/MICRODADOS.csv", sep = ";")
+dados <- filter(dados, Classificacao == "Confirmados")
+dados$Sexo <- fct_recode(dados$Sexo, 
+                    Masculino ="M",
+                    Feminino = "F",
+                    Ignorados = "I")
+dados$Idade <- str_sub(dados$IdadeNaDataNotificacao, end = 2)
+```
+
+```{r, echo=FALSE}
+dados <- read.csv("C:/Users/pedro/Desktop/MICRODADOS.csv", sep = ";")
+dados <- filter(dados, Classificacao=="Confirmados")
+dados$Sexo <- fct_recode(dados$Sexo, 
+                    Masculino ="M",
+                    Feminino = "F",
+                    Ignorados = "I")
+dados$Idade <- str_sub(dados$IdadeNaDataNotificacao, end = 2)
+```
+
+
+
+Com essas filtragens, já podemos começar a gerar alguns gráficos interessantes como, por exemplo, a quantidade de casos confirmados separados por faixa etária a quantidade de casos confirmados separados por Raça/Cor e um histograma de frequência separado por sexo. Vale ressaltar, que para gerar o histograma é necessário mudarmos a varíavel "Idade" para numeric, basta útilizar a função `as.numeric`.  
+
+```{r fig.width = 9, fig.height = 7 }
+ggplot(dados) +
+  geom_bar(aes(x = FaixaEtaria), fill = "purple") +
+  labs(y = "Frequência",
+       x = "Faixa Etária",
+       title = "Gráfico de frequência ") +
+  scale_y_continuous(breaks = seq(0, 100000, 2500)) +
+  theme_calc()
+ggplot(dados) +
+  geom_bar(aes(x = RacaCor, fill = RacaCor)) +
+  scale_y_continuous(breaks = seq(0, 100000, 2500)) +
+  labs(y = "Frequência",
+       x = "Raça/Cor",
+       title = "Gráfico de frequência") +
+  theme_bw() +
+  scale_fill_viridis_d(name = "Raça/Cor")
+dados$Idade <- as.numeric(dados$Idade)
+ggplot(dados, aes(x = Idade, y = ..density..)) +
+  geom_histogram(color = "white", bins = 50, fill = 'purple') +
+  facet_wrap(~ Sexo) +
+  theme_bw() +
+  ylab("Frequência") +
+  scale_fill_viridis_d()
+```
+
+Uma outra coisa interessanta a ser feita é analisarmos os casos nas regiões do Espirito Santo. Seguimos a divisão feita pelo Governo do Estado que pode ser encontra da [clicando aqui](http://www.ijsn.es.gov.br/mapas/), onde o estado foi dividido nas seguintes regiões: Metropolitana, Central, norte e sul.  
+usamos uma `function` para atribuirmos cada cidade a sua devida região.
+
+```{r message=FALSE}
+regiao <- rep(nrow(dados))
+classifica_regiao <- function(Municipio){
+  reg_metropolitana <- c(
+  'VITORIA',
+  "DOMINGOS MARTINS" ,
+  "SANTA LEOPOLDINA" ,
+  "MARECHAL FLORIANO" ,
+  'FUNDAO' ,
+  'SERRA' ,
+  'VILA VELHA' ,
+  'CARIACICA' ,
+  'VIANA' ,
+  'GUARAPARI' ,
+  "SANTA LEOPOLDINA" ,
+  "DOMIGOS MARTINS" ,
+  "MARCHAL FLORIANO" ,
+  "SANTA TERESA" ,
+  "SANTA MARIA DO JETIBA" ,
+  "ITAGUACU" ,
+  "LARANJA DA TERRA" ,
+  "ITARANA" ,
+  "AFONSO CLAUDIO" ,
+  "VENDA NOVA DO IMIGRANDE" ,
+  "BREJETUBA" ,
+  "CONCEICAO DO CASTELO"
+ )
+  reg_norte <- c(
+    "AGUIA BRANCA " ,
+    "VENDA NOVA DO IMIGRANTE" ,
+    "SANTA MARIA DE JETIBA" ,
+    "MANTENOPOLIS" ,
+    "JAGUARE" ,
+    "SAO MATEUS" ,
+    "NOVA VENECIA" ,
+    "BARRA DE SAO FRANCISCO" ,
+    "VILA PAVAO" ,
+    "BOA ESPERANCA" ,
+    "AGUA DOCE DO NORTE" ,
+    "CONCEICAO DA BARRA" ,
+    "PINHEIROS" ,
+    "PEDRO CANARIO" ,
+    "MONTANHA" ,
+    "MUCURICI" ,
+    "PONTO BELO" ,
+    "ECOPORANGA"
+  )
+  
+  reg_central <- c(
+    "ARACRUZ" ,
+    "IBIRACU" ,
+    "JOAO NEIVA" ,
+    "SAO ROQUE DO CANAA" ,
+    "BAIXO GUANDU" ,
+    "COLATINA" ,
+    "MARILANDIA" ,
+    "LINHARES" ,
+    "RIO BANANAL" ,
+    "PANCAS" ,
+    "SOORETAMA" ,
+    "GOVERNADOR LINDENBERG" ,
+    "SAO DOMINGOS DO NORTE" ,
+    "ALTO RIO NOVO" ,
+    "SAO GABRIEL DA PALHA" ,
+    "VILA VALERIO"
+  )
+  
+  reg_sul <- c(
+    'PRESIDENTE KENNEDY'	,
+    "MUQUI" ,
+    'MARATAIZES'	,
+    'ITAPEMIRIM'	,
+    'MIMOSO DO SUL' ,
+    'APIACA' ,
+    'BOM JESUS DO NORTE' ,
+    'SAO JOSE DO CALCADO' ,
+    "MUQI" ,
+    "ATILIO VIVACQUA" ,
+    "PIUMA " ,
+    "RIO NOVO DO SUL" ,
+    "CACHOEIRO DE ITAPEMIRIM" ,
+    "JERONIMO MONTEIRO" ,
+    "ALEGRE" ,
+    "GUACUI" ,
+    "DORES DO RIO PRETO" ,
+    "DIVINO DE SAO LOURENCO" ,
+    "IBITIRAMA" ,
+    "IUNA" ,
+    "IBATIBA" ,
+    "IRUPI" ,
+    "MUNIZ FREIRE" ,
+    "CASTELO" ,
+    "VARGEM ALTA" ,
+    "ALFREDO CHAVES" ,
+    "ANCHIETA" ,
+    "ICONHA" ,
+    "RIO NOVO DO SUL" ,
+    "PIUMA" ,
+    "ICONHA"
+  )
+  regiao <- 
+    ifelse(any(Municipio == reg_metropolitana),
+           "Região Metropolitana", 
+           ifelse(any(Municipio == reg_norte), 
+                  "Região Norte", 
+                  ifelse(any(Municipio == reg_central), 
+                         "Região Central", 
+                         ifelse(any(Municipio == reg_sul), 
+                                "Região Sul", "Outro Estado")
+                         )
+                  )
+           )
+  return(regiao)
+}
+dados$regiao <- sapply(dados$Municipio, classifica_regiao)
+```
+
+
+Pronto, agora conseguiremos ver de uma forma clara a quantidade de casos em casa região
+
+```{r fig.width = 9, fig.height = 7}
+ggplot(dados) + geom_bar(aes(x = regiao, fill = regiao)) +
+  scale_y_continuous(breaks = seq(0, 100000, 10000)) +
+  labs(y = "Frequência",
+       x = "Regiões do Espirito Santo",
+       title = "Gráfico de frequência") +
+  theme_bw() +
+  scale_fill_viridis_d()
+```
+
+
+Pronto, agora conseguiremos ver de uma forma clara a quantidade de casos em casa região
+
+
+Podemos notar o quanto a região metropolitana se destaca em relação as outras, a grosso modo, possui mais casos confirmados do que as outras 3 regiões juntas. A região norte foi a que menos registrou casos.  
+
+Agora, iremos análisar em cada uma dessas regiões, os casos confirmados separados por sexo e raça/cor. Uma observação a ser feita é, como não possui nenhum caso com sexo classificado como "indeterminado" fizemos um filtro para tirar essa observação do gráfico, apenas para fim estético.
+
+
+os códigos abaixos foram repetidos para cada uma das regiões, mudando apenas o parâmetro
+
+```{r}
+regiao_m <- dados %>%
+  filter(regiao == "Região Metropolitana",
+         Sexo == "Masculino" | Sexo == "Feminino")
+ggplot(regiao_m) +
+  geom_bar(aes(RacaCor, fill = Sexo), position = "dodge") +
+  scale_y_continuous(breaks = seq(0, 100000, 2500)) +
+  labs(y = "Frequência", x = "Raça/Cor", title = "Região Metropolitana ") +
+  theme_bw() +
+  scale_fill_viridis_d()
+```
+    
+    
+    
+    
+    
+```{r message = F, echo=F}
+regiao_c <- dados %>%
+  filter(dados$regiao == "Região Central",
+         dados$Sexo == "Masculino" | dados$Sexo == "Feminino")
+regiao_n <- dados %>%
+  filter(dados$regiao == "Região Norte",
+         dados$Sexo == "Masculino" | dados$Sexo == "Feminino")
+regiao_s <- dados %>%
+  filter(dados$regiao == "Região Sul",
+         dados$Sexo == "Masculino" | dados$Sexo == "Feminino")
+ggplot(regiao_m) + geom_bar(aes(RacaCor, fill = Sexo), position = "dodge") + scale_y_continuous(breaks = seq(0, 100000, 2000)) +
+  labs(y = "Frequência", x = "Raça/Cor", title = "Região Metropolitana ") + theme_bw() + scale_fill_viridis_d()
+ggplot(regiao_c) + geom_bar(aes(RacaCor, fill = Sexo), position = "dodge") + scale_y_continuous(breaks = seq(0, 100000, 1000)) +
+  labs(y = "Frequência", x = "Raça/Cor", title = "Região Central ") + theme_bw() + scale_fill_viridis_d()
+ggplot(regiao_n) + geom_bar(aes(RacaCor, fill = Sexo), position = "dodge") + scale_y_continuous(breaks = seq(0, 100000, 500)) +
+  labs(y = "Frequência", x = "Raça/Cor", title = "Região Norte") + theme_bw() + scale_fill_viridis_d()
+ggplot(regiao_s) + geom_bar(aes(RacaCor, fill = Sexo), position = "dodge") + scale_y_continuous(breaks = seq(0, 100000, 1000)) +
+  labs(y = "Frequência", x = "Raça/Cor", title = "Região Sul") + theme_bw() + scale_fill_viridis_d()
+```
+
+Ao olharmos para os gráficos dessas regiões podemos tirar algumas conclusões. De forma geral, ao olharmos para a variável sexo, o feminino é maior em relação ao masculino em quase todas as situações com algumas exceções, como por exemplo, na raça classificada como "ignorado". Se olharmos agora para a variável raça/cor, é visível que a classificação branca e parda aparecem muito mais em relação as outras, a raça indígina, apesar de frequente em todas as 4 regiões, tem uma presença muito pequena aparecendo mais na região central.
+
+
+Agora queremos observar a distribuição dos casos, separados por sexo, ao longo do tempo.  
+
+
+
+
+```{r message=F}
+dados <- dados %>%
+  mutate(DataNotificacao = as.Date(DataDiagnostico))
+casos_t <- dados %>%
+  group_by(Sexo, DataNotificacao) %>%
+  summarise(n_casos = n()) %>%
+  tidyr::complete(
+    tidyr::nesting(Sexo),
+    DataNotificacao = seq.Date(min(dados$DataNotificacao),
+                               max(dados$DataNotificacao),
+                               by = "day"),
+    fill = list(n_casos = 0)
+  ) %>%
+  mutate(casos_acumulados = cumsum(n_casos))
+ggplot(casos_t) +
+  theme_minimal() +
+  aes(x = DataNotificacao, y = casos_acumulados, color = Sexo) +
+  geom_line() +
+  scale_color_viridis_d() +
+  labs(y = "Número de casos acumulados",
+       x = "Data Diagnóstico",
+       title = "Casos acumulados por sexo")
+```
+
+Observando o gráfico de casos acumulados separado por sexo, podemos ver de forma mais clara o que foi dito antes, o sexo femino tem uma frequência consideravelmente maior em relação ao masculino e foi maior em todo o intervalo de tempo analisado.  
+
+Uma última coisa interessante a ser feita, é análisar a taxa de letalidade da COVID-19. Para fazer isso precisamos calcular essa taxa e separar com as variáveis que queremos exibir no gráfico.  
+
+Para fazer criamos um DataFrame chamado "casos" que vai agrupar as variáveis "RacaCor" e "Sexo" e fazer a contagem de casos confirmados. Depois, criamos um otro data frame com as mesmas variáveis, porém esse vai contar o número de mortes pela COVID-19. Por último, o DataFrame chamado "letalidade" foi responsável por calcular a taxa de letalidade da COVID-19. Vale ressaltar que a taxa de letalidade é a proporção entre o número de óbitos por uma doença em relação ao número de indivíduos acometidos por essa doença.
+
+```{r message=F}
+casos <- dados %>%
+  group_by(RacaCor, Sexo) %>%
+  summarise(n_casos = n())
+mortes <- dados %>%
+  filter(Evolucao ==  "Óbito pelo COVID-19") %>%
+  group_by(RacaCor, Sexo) %>%
+  summarise(n_mortes = n())
+letalidade <- inner_join(casos, mortes) %>%
+  mutate(taxa_l =   ifelse(n_casos == 0, 0,
+                           round(100 * n_mortes / n_casos, 1)))
+```
+
+
+Certo, por último iremos plotar o gráfico
+
+```{r message=F}
+ggplot(letalidade) + geom_col(aes(x = RacaCor, y = taxa_l, fill = Sexo), position = "dodge") +
+  labs(x = "Pessoas",
+       y = "Letalidade(%)",
+       title = "Taxa de letalidade da COVID-19 no ES") +
+  scale_fill_viridis_d() +
+  theme_bw()
+```
+
+Ao observamos o gráfico, notamos que a taxa de letalidade do sexo masculino é maior em relação ao sexo feminino em todas as raças . Além disso, notamos também que a taxa de letalidade de pessoas indigenas é a maior de todas as 6 registradas. Notamos também uma diferença muito grande em relação ao sexo feminino e masculino em pessoas pretas e brancas, principalmente, enquanto em pessoas amarelas existe um certo "equilibrio".
