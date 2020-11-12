@@ -24,6 +24,7 @@ library(tidyr)
 library(tidyverse)
 library(ggthemes)
 library(forcats)
+library(viridis)
 
 ```
 
@@ -91,21 +92,32 @@ ggplot(dados, aes(x = Idade, y = ..density..)) +
   facet_wrap( ~ Sexo) +
   theme_bw() +
   ylab("Frequência") +
-  scale_fill_manual(values = c("yellow", "red", "purple"))
+  scale_fill_viridis_d()
 
 
 ```
 
 Uma outra coisa interessanta a ser feita é analisarmos os casos nas regiões do Espirito Santo. Seguimos a divisão feita pelo Governo do Estado que pode ser encontra da [clicando aqui](http://www.ijsn.es.gov.br/mapas/), onde o estado foi dividido nas seguintes regiões: Metropolitana, Central, norte e sul.  
-usamos um `for` para atribuirmos cada cidade a sua devida região.
+usamos uma `function` para atribuirmos cada cidade a sua devida região.
 
+<<<<<<< HEAD
+```{r message=FALSE}
 
+regiao <- rep(nrow(dados))
+=======
+
+<<<<<<< HEAD
+```{r message=FALSE}
+regiao <- rep(nrow(dados))
+=======
 ```{r message=FALSE, echo=FALSE}
 # attach(dados)
 regiao <- rep(nrow(dados))
 
 
 
+>>>>>>> 6fb67b8ee1bb111e45970230a200d51ad4c9e0ff
+>>>>>>> bc7750ce6f0b267147c2b75488fcc8038c926f63
 classifica_regiao <- function(Municipio){
   reg_metropolitana <- c(
   'VITORIA',
@@ -130,8 +142,93 @@ classifica_regiao <- function(Municipio){
   "VENDA NOVA DO IMIGRANDE" ,
   "BREJETUBA" ,
   "CONCEICAO DO CASTELO"
+<<<<<<< HEAD
+ )
+
+=======
 )
+<<<<<<< HEAD
+>>>>>>> bc7750ce6f0b267147c2b75488fcc8038c926f63
+  reg_norte <- c(
+    "AGUIA BRANCA " ,
+    "VENDA NOVA DO IMIGRANTE" ,
+    "SANTA MARIA DE JETIBA" ,
+    "MANTENOPOLIS" ,
+    "JAGUARE" ,
+    "SAO MATEUS" ,
+    "NOVA VENECIA" ,
+    "BARRA DE SAO FRANCISCO" ,
+    "VILA PAVAO" ,
+    "BOA ESPERANCA" ,
+    "AGUA DOCE DO NORTE" ,
+    "CONCEICAO DA BARRA" ,
+    "PINHEIROS" ,
+    "PEDRO CANARIO" ,
+    "MONTANHA" ,
+    "MUCURICI" ,
+    "PONTO BELO" ,
+    "ECOPORANGA"
+  )
   
+  reg_central <- c(
+    "ARACRUZ" ,
+    "IBIRACU" ,
+    "JOAO NEIVA" ,
+    "SAO ROQUE DO CANAA" ,
+    "BAIXO GUANDU" ,
+    "COLATINA" ,
+    "MARILANDIA" ,
+    "LINHARES" ,
+    "RIO BANANAL" ,
+    "PANCAS" ,
+    "SOORETAMA" ,
+    "GOVERNADOR LINDENBERG" ,
+    "SAO DOMINGOS DO NORTE" ,
+    "ALTO RIO NOVO" ,
+    "SAO GABRIEL DA PALHA" ,
+    "VILA VALERIO"
+  )
+  
+  reg_sul <- c(
+    'PRESIDENTE KENNEDY'	,
+    "MUQUI" ,
+    'MARATAIZES'	,
+    'ITAPEMIRIM'	,
+    'MIMOSO DO SUL' ,
+    'APIACA' ,
+    'BOM JESUS DO NORTE' ,
+    'SAO JOSE DO CALCADO' ,
+    "MUQI" ,
+    "ATILIO VIVACQUA" ,
+    "PIUMA " ,
+    "RIO NOVO DO SUL" ,
+    "CACHOEIRO DE ITAPEMIRIM" ,
+    "JERONIMO MONTEIRO" ,
+    "ALEGRE" ,
+    "GUACUI" ,
+    "DORES DO RIO PRETO" ,
+    "DIVINO DE SAO LOURENCO" ,
+    "IBITIRAMA" ,
+    "IUNA" ,
+    "IBATIBA" ,
+    "IRUPI" ,
+    "MUNIZ FREIRE" ,
+    "CASTELO" ,
+    "VARGEM ALTA" ,
+    "ALFREDO CHAVES" ,
+    "ANCHIETA" ,
+    "ICONHA" ,
+    "RIO NOVO DO SUL" ,
+    "PIUMA" ,
+    "ICONHA"
+  )
+<<<<<<< HEAD
+
+=======
+=======
+>>>>>>> 6fb67b8ee1bb111e45970230a200d51ad4c9e0ff
+  
+>>>>>>> bc7750ce6f0b267147c2b75488fcc8038c926f63
   regiao <- 
     ifelse(any(Municipio == reg_metropolitana),
            "Região Metropolitana", 
@@ -145,10 +242,18 @@ classifica_regiao <- function(Municipio){
                   )
            )
   return(regiao)
+<<<<<<< HEAD
+  
+=======
+<<<<<<< HEAD
+=======
+>>>>>>> bc7750ce6f0b267147c2b75488fcc8038c926f63
 }
 
 source('funcao_classifica_regiao.R')
 
+<<<<<<< HEAD
+=======
 dados <- dados %>% 
   mutate(regiao = classifica_regiao(Municipio))
 
@@ -226,21 +331,44 @@ dados <- dados %>%
       Municipio[i] == "ICONHA") {
     regiao[i] <- 'Região Sul'
   }
+>>>>>>> 6fb67b8ee1bb111e45970230a200d51ad4c9e0ff
 }
+source('funcao_classifica_regiao.R')
+>>>>>>> bc7750ce6f0b267147c2b75488fcc8038c926f63
 dados$regiao <- regiao
+dasadd
 
 ```
 
-Devido ao tamanho do código, optamos por não exibilo. Havia presente na planilha alguns dados de fora do estado, do Rio de Janeiro por exemplo, como queremos análisar apenas o Espirito Santo, aplicamos um filtro para pegar apenas as cidade que foram atribuídas à uma das 4 regiões
+
 
 
 ```{r}
 dados2 <- dados %>%
   filter(regiao != "Outro Estado") 
+<<<<<<< HEAD
+
+=======
+<<<<<<< HEAD
+>>>>>>> bc7750ce6f0b267147c2b75488fcc8038c926f63
 
 # 
 #   filter(regiao == "Região Central" |regiao== "Região Metropolitana" |regiao=="Região Norte"| regiao=="Região Sul") 
 
+<<<<<<< HEAD
+
+=======
+=======
+>>>>>>> bc7750ce6f0b267147c2b75488fcc8038c926f63
+
+# 
+#   filter(regiao == "Região Central" |regiao== "Região Metropolitana" |regiao=="Região Norte"| regiao=="Região Sul") 
+
+<<<<<<< HEAD
+
+=======
+>>>>>>> 6fb67b8ee1bb111e45970230a200d51ad4c9e0ff
+>>>>>>> bc7750ce6f0b267147c2b75488fcc8038c926f63
 # dados2 <- rename(dados2, região = "regiao")
 
 ```
@@ -268,14 +396,28 @@ os códigos abaixos foram repetidos para cada uma das regiões, mudando apenas o
 ```{r}
 regiao_m <-dados2 %>% 
   filter(região == "Região Metropolitana",
-         Sexo == "Masculino" | dados2$Sexo=="Feminino") 
+         Sexo == "Masculino" | Sexo=="Feminino") 
 
 ggplot(regiao_m) + 
   geom_bar(aes(RacaCor, fill=Sexo), position = "dodge") + 
   scale_y_continuous(breaks = seq(0,100000,2500)) +
   labs(y="Frequência",x="Raça/Cor",title = "Região Metropolitana ") + 
   theme_bw() + 
+<<<<<<< HEAD
+
+  scale_fill_viridis_d()
+  
+
   scale_fill_manual(values=c("yellow","purple"))
+
+=======
+<<<<<<< HEAD
+  scale_fill_viridis_d()
+  
+=======
+  scale_fill_manual(values=c("yellow","purple"))
+>>>>>>> 6fb67b8ee1bb111e45970230a200d51ad4c9e0ff
+>>>>>>> bc7750ce6f0b267147c2b75488fcc8038c926f63
 ```
     
     
@@ -306,6 +448,7 @@ ggplot(regiao_s) + geom_bar(aes(RacaCor, fill=Sexo), position = "dodge") + scale
 ```
 
 Ao olharmos para os gráficos dessas regiões podemos tirar algumas conclusões. De forma geral, ao olharmos para a variável sexo, o feminino é maior em relação ao masculino em quase todas as situações com algumas exceções, como por exemplo, na raça classificada como "ignorado". Se olharmos agora para a variável raça/cor, é visível que a classificação branca e parda aparecem muito mais em relação as outras, a raça indígina, apesar de frequente em todas as 4 regiões, tem uma presença muito pequena aparecendo mais na região central.
+
 
 Agora queremos observar a distribuição dos casos, separados por sexo, ao longo do tempo.  
 
@@ -361,7 +504,8 @@ ggplot(letalidade) + geom_col(aes(x= RacaCor, y=taxa_l, fill= Sexo),position = "
   labs( x="Pessoas",
         y="Letalidade(%)",
         title="Taxa de letalidade da COVID-19 no ES") + 
-  scale_fill_manual(values = c("yellow","purple")) + theme_bw()
+  scale_fill_viridis_d() + 
+  theme_bw()
 
 ```
 
