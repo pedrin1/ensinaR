@@ -95,7 +95,7 @@ Para o próximo gráfico, aplicamos um filtro na variável sexo que removeu os d
 dados <- filter(dados, Sexo != "Ignorados")
 ```
 
-Neste gráfico de histograma podemos comparar os sexos masculino e o feminino. Podemos notar que as duas distribuições de idade parece ser bem semelhante entre os dois grupos.
+Neste gráfico de histograma podemos comparar os sexos masculino e o feminino. Podemos notar que as duas distribuições de idade parece ser bem semelhantes entre os dois grupos.
 
 ```{r fig.width = 9, fig.height = 7}
 dados <- dados %>% 
@@ -261,7 +261,7 @@ ggplot(dados) + geom_bar(aes(x = regiao, fill = regiao)) +
   facet_grid(scales = "free")
 ```
 
-Podemos notar o quanto a região metropolitana se destaca em relação às outras, pois possui mais casos confirmados do que as outras 4 regiões juntas. Porém, deve-se ressaltar que tal região essa região é a mais populosa do Estado. A região norte, considerando as observações somente do Espírito Santo, foi a que menos registrou casos. Uma análise interessante que poderia ser feita, porém que não adicionaremos nesse post para não nos alongarmos, é comparar o número de confirmados pela população da região, o que nos daria um índice de incidência da doença. Isso ajudaria a entender melhor a diferença entre as regiões.
+Podemos notar o quanto a região metropolitana se destaca em relação às outras, pois possui mais casos confirmados do que as outras 4 regiões juntas. Porém, deve-se ressaltar que tal região essa região é a mais populosa do Estado. A região norte, considerando as observações somente do Espírito Santo, foi a que menos registrou casos. Uma análise interessante que poderia ser feita, porém que não adicionaremos nesse post para não nos alongarmos, é comparar o número de confirmados pela população da região, o que nos daria um índice de incidência da doença. Isso ajudaria a entender melhor a diferença entre as regiões, porém isso não será analisado aqui nesse post.
 
 Agora, iremos analisar em cada uma dessas regiões, os casos confirmados separados por sexo e raça/cor. Para essa análise, retiramos as observações de outros Estados. Utilizamos a função `facet_wrap` para separar os gráficos por região.
 
@@ -322,7 +322,9 @@ casos <- dados %>%
 mortes <- dados %>%
   filter(Evolucao ==  "Óbito pelo COVID-19") %>%
   group_by(RacaCor, Sexo) %>%
-  summarise(n_mortes = n())
+  summarise(n_mortes = n()) %>% 
+  tidyr::complete(RacaCor, Sexo,
+                  fill = list( n_mortes = 0))
 
 letalidade <- inner_join(casos, mortes) %>%
   mutate(taxa_l =   ifelse(n_casos == 0, 0,
@@ -338,7 +340,8 @@ ggplot(letalidade) +
        y = "Letalidade (%)",
        title = "Taxa de letalidade da COVID-19 no ES") +
   scale_fill_viridis_d() +
-  theme_bw()
+  theme_bw() 
+  
 ```
 
 Ao observamos o gráfico, notamos que a taxa de letalidade do sexo masculino é sempre maior em relação ao sexo feminino em todas as raças. É possível notar também que para raça "Indígena" só observamos valores para o sexo "Masculino". As maiores taxas para ambos os sexos foi observada na raça "Amarela".
